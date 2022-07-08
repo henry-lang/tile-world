@@ -8,6 +8,7 @@ use glium::{
 use simple_logger::SimpleLogger;
 use std::path::PathBuf;
 
+use shaders::Shaders;
 use tile::TileTypes;
 
 struct Resources {
@@ -26,6 +27,8 @@ fn main() {
 
     let event_loop = glutin::event_loop::EventLoop::new();
     let display = create_display(&event_loop);
+
+    let shaders = Shaders::create_all(&display);
 
     let tile_types =
         tile::TileTypes::load(["assets", "tile_types.ron"].iter().collect::<PathBuf>());
