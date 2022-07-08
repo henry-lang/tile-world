@@ -3,7 +3,7 @@ use std::error::Error;
 use std::io::Read;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    //println!("cargo:rerun-if-changed=src/shaders");
+    println!("cargo:rerun-if-changed=src/shaders");
 
     let mut compiler = shaderc::Compiler::new().unwrap();
     let mut options = shaderc::CompileOptions::new().unwrap();
