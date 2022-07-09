@@ -11,6 +11,11 @@ use std::path::{Path, PathBuf};
 
 pub type TileType = usize;
 
+#[derive(Copy, Clone, Debug)]
+pub struct Tile {
+    pub tile_type: TileType,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct TileTypes {
     types: Vec<TileProperties>,
@@ -30,7 +35,6 @@ impl TileTypes {
     }
 
     pub fn build_texture(&self, display: &Display) -> Texture2dArray {
-        log::info!("Loading textures...");
         let textures = self
             .types
             .iter()
@@ -42,14 +46,16 @@ impl TileTypes {
                 ]
                 .iter()
                 .collect::<PathBuf>();
-                log::info!("Loading texture at {}", path.to_string_lossy());
 
                 let image = image::load(
-                    BufReader::new(File::open(path).unwrap()),
+                    BufReader::new(File::open(&path).expect("open image")),
                     image::ImageFormat::Png,
                 )
-                .unwrap()
+                .expect("load image")
                 .to_rgba8();
+
+                log::info!("Loaded image {}", path.to_string_lossy());
+
                 let dimensions = image.dimensions();
 
                 RawImage2d::from_raw_rgba(image.into_raw(), dimensions)

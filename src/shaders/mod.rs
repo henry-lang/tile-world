@@ -9,30 +9,42 @@ macro_rules! include_shader {
     };
 }
 
-static DEFAULT_VERT: &[u8] = include_shader!("default.vert.spv");
-static DEFAULT_FRAG: &[u8] = include_shader!("default.frag.spv");
+static TILES_VERT: &[u8] = include_shader!("tiles.vert.spv");
+static TILES_FRAG: &[u8] = include_shader!("tiles.frag.spv");
+static TILES_GEOM: &[u8] = include_shader!("tiles.geom.spv");
 
 pub struct Shaders {
-    default: Program,
+    tiles: Program,
 }
 
 impl Shaders {
     pub fn create_all(display: &Display) -> Self {
-        let default = Program::new(
+        let tiles = Program::new(
             display,
-            ProgramCreationInput::SpirV(SpirvProgram::from_vs_and_fs(
-                SpirvEntryPoint {
-                    binary: DEFAULT_VERT,
+            ProgramCreationInput::SpirV(
+                SpirvProgram::from_vs_and_fs(
+                    SpirvEntryPoint {
+                        binary: TILES_VERT,
+                        entry_point: "main",
+                    },
+                    SpirvEntryPoint {
+                        binary: TILES_FRAG,
+                        entry_point: "main",
+                    },
+                )
+                .geometry_shader(Some(SpirvEntryPoint {
+                    binary: TILES_GEOM,
                     entry_point: "main",
-                },
-                SpirvEntryPoint {
-                    binary: DEFAULT_FRAG,
-                    entry_point: "main",
-                },
-            )),
+                })),
+            ),
         )
         .unwrap();
 
-        Self { default }
+        log::info!("Created shader program: tiles");
+        Self { tiles }
+    }
+
+    pub fn tiles(&self) -> &Program {
+        &self.tiles
     }
 }

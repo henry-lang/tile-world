@@ -1,5 +1,6 @@
 mod shaders;
 mod tile;
+mod world;
 
 use glium::{
     glutin::{self, event_loop::EventLoop, window::WindowBuilder, ContextBuilder},
@@ -30,8 +31,7 @@ fn main() {
 
     let shaders = Shaders::create_all(&display);
 
-    let tile_types =
-        tile::TileTypes::load(["assets", "tile_types.ron"].iter().collect::<PathBuf>());
+    let tile_types = TileTypes::load(["assets", "tile_types.ron"].iter().collect::<PathBuf>());
     log::info!("Found {} tile types from tile_types.ron", tile_types.len());
 
     tile_types.build_texture(&display);

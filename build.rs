@@ -8,7 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut compiler = shaderc::Compiler::new().unwrap();
     let mut options = shaderc::CompileOptions::new().unwrap();
     options.add_macro_definition("EP", Some("main"));
-
+    std::fs::remove_dir_all("assets/shaders")?;
     std::fs::create_dir_all("assets/shaders")?;
 
     for entry in std::fs::read_dir("src/shaders")? {
