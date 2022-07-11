@@ -8,7 +8,7 @@ use glium::{
     glutin::{
         self,
         event::{Event, WindowEvent},
-        event_loop::EventLoop,
+        event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
         ContextBuilder,
     },
@@ -20,9 +20,9 @@ use glium::{
 use glam::{Mat4, Vec2};
 
 use simple_logger::SimpleLogger;
-use std::path::PathBuf;
 use std::rc::Rc;
 use std::time::Instant;
+use std::{path::PathBuf, time::Duration};
 
 use camera::Camera;
 use input::Input;
@@ -41,7 +41,10 @@ fn create_display(event_loop: &EventLoop<()>) -> Display {
 }
 
 fn main() {
-    SimpleLogger::new().init().unwrap();
+    SimpleLogger::new()
+        .with_module_level("winit", log::LevelFilter::Info)
+        .init()
+        .unwrap();
 
     let event_loop = glutin::event_loop::EventLoop::new();
 
@@ -80,8 +83,9 @@ fn main() {
 
     let display_clone = display.clone();
 
-    let mut old_time = Instant::now();
     event_loop.run(move |event, _, control_flow| {
+        //*control_flow = ControlFlow::WaitUntil(Instant::now() + Duration::from_millis(1000 / 60));
+
         input.update(&event);
         camera.update(&input);
 
@@ -94,7 +98,6 @@ fn main() {
             },
             _ => (),
         }
-
         let uniforms = uniform! {
             projection: camera.projection_matrix().to_cols_array_2d()
         };
