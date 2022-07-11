@@ -35,6 +35,8 @@ impl TileTypes {
     }
 
     pub fn build_texture(&self, display: &Display) -> Texture2dArray {
+        let start = std::time::Instant::now();
+
         let textures = self
             .types
             .iter()
@@ -62,7 +64,12 @@ impl TileTypes {
             })
             .collect::<Vec<_>>();
 
-        Texture2dArray::new(display, textures).expect("create texture array")
+        let texture = Texture2dArray::new(display, textures).expect("create texture array");
+
+        let end = std::time::Instant::now();
+        log::info!("Texture creation took {}ms", (end - start).as_millis());
+
+        texture
     }
 }
 

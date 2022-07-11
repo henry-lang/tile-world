@@ -2,19 +2,25 @@ use crate::tile::{Tile, TileType, TileTypes};
 
 pub struct World {
     tiles: Vec<Tile>,
+    width: usize,
+    height: usize,
 }
 
 impl World {
-    pub fn new(w: usize, h: usize, fill_tile: TileType) -> Self {
+    pub fn new(width: usize, height: usize, fill_tile: TileType) -> Self {
         Self {
             tiles: vec![
                 Tile {
                     tile_type: fill_tile
                 };
-                w * h
+                width * height
             ],
+            width,
+            height,
         }
     }
 
-    pub fn get(x: usize, y: usize) {}
+    pub fn get(&self, x: usize, y: usize) -> Tile {
+        self.tiles[x + y * self.width]
+    }
 }

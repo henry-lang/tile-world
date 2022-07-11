@@ -135,6 +135,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "clamp"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0113a8ae379a061c89a71d57a809439f5ce550b6a76063ab5ba2b1cb180971f"
+
+[[package]]
 name = "cmake"
 version = "0.1.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -910,6 +916,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rbitset"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d4235923ec6469ea8faa34c797986e88037ccfa3d34eefb722f3abb5b5f1637"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1091,10 +1106,12 @@ dependencies = [
 name = "tile-world"
 version = "0.1.0"
 dependencies = [
+ "clamp",
  "glam",
  "glium",
  "image",
  "log",
+ "rbitset",
  "ron",
  "serde",
  "shaderc",
