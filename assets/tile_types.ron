@@ -3,6 +3,7 @@ TileTypes (
         TileProperties (
             system_name: "air",
             display_name: "Air",
+            rendered: false,
             lighting: White (intensity: 8)
         ),
         TileProperties (

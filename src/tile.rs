@@ -40,6 +40,7 @@ impl TileTypes {
         let textures = self
             .types
             .iter()
+            .filter(|tile_type| tile_type.rendered)
             .map(|tile_type| {
                 let path = [
                     "assets",
@@ -78,8 +79,17 @@ pub struct TileProperties {
     pub system_name: String,
     pub display_name: String,
 
+    #[serde(default = "TileProperties::default_rendered")]
+    pub rendered: bool,
+
     #[serde(default)]
     pub lighting: TileLighting,
+}
+
+impl TileProperties {
+    fn default_rendered() -> bool {
+        true
+    }
 }
 
 #[derive(Deserialize, Debug)]

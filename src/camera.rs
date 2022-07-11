@@ -29,7 +29,7 @@ impl Camera {
     }
 
     pub fn update(&mut self, input: &Input) {
-        let speed = 10. * (1. / self.zoom);
+        let speed = 0.15;
 
         if input.is_key_down(VirtualKeyCode::W) {
             self.position.y -= speed;
