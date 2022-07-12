@@ -40,7 +40,6 @@ impl TileTypes {
         let textures = self
             .types
             .iter()
-            .filter(|tile_type| tile_type.rendered)
             .map(|tile_type| {
                 let path = [
                     "assets",
@@ -67,8 +66,7 @@ impl TileTypes {
 
         let texture = Texture2dArray::new(display, textures).expect("create texture array");
 
-        let end = std::time::Instant::now();
-        log::info!("Texture creation took {}ms", (end - start).as_millis());
+        log::info!("Texture creation took {}ms", start.elapsed().as_millis());
 
         texture
     }

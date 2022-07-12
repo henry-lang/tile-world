@@ -12,7 +12,9 @@ use glium::{
         window::WindowBuilder,
         ContextBuilder,
     },
-    implement_vertex, uniform, Display, Surface,
+    implement_vertex, uniform,
+    uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior},
+    Display, DrawParameters, Surface,
 };
 
 use glam::{Mat4, Vec2};
@@ -53,7 +55,7 @@ fn main() {
     let tile_types = TileTypes::load(["assets", "tile_types.ron"].iter().collect::<PathBuf>());
     log::info!("Found {} tile types from tile_types.ron", tile_types.len());
 
-    tile_types.build_texture(&display);
+    let tile_textures = tile_types.build_texture(&display);
 
     let mut camera = Camera::new(display.clone(), Vec2::splat(0.5), 0., 100.0..1000.);
     let mut input = Input::new();
@@ -105,8 +107,16 @@ fn main() {
             },
             _ => (),
         }
+
+        let behavior = SamplerBehavior {
+            minify_filter: MinifySamplerFilter::Nearest,
+            magnify_filter: MagnifySamplerFilter::Nearest,
+            ..Default::default()
+        };
+
         let uniforms = uniform! {
-            projection: camera.projection_matrix().to_cols_array_2d()
+            projection: camera.projection_matrix().to_cols_array_2d(),
+            tiles: Sampler(&tile_textures, behavior)
         };
 
         let mut target = display_clone.draw();
