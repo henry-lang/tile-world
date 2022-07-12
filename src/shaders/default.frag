@@ -1,7 +1,11 @@
 #version 330 core
 
+uniform sampler2DArray tiles; 
+
+in vec2 v_tex_coord;
+
 out vec4 color;
 
 void main() {
-    color = vec4(1.0, 0.0, 0.0, 1.0);
+    color = texture(tiles, vec3(v_tex_coord, 0));
 }

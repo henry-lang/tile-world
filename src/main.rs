@@ -8,13 +8,11 @@ use glium::{
     glutin::{
         self,
         event::{Event, WindowEvent},
-        event_loop::{ControlFlow, EventLoop},
+        event_loop::EventLoop,
         window::WindowBuilder,
         ContextBuilder,
     },
-    implement_vertex,
-    index::PrimitiveType,
-    uniform, Display, Surface,
+    implement_vertex, uniform, Display, Surface,
 };
 
 use glam::{Mat4, Vec2};
@@ -62,24 +60,33 @@ fn main() {
 
     #[derive(Copy, Clone)]
     struct Vertex {
+        tex_coord: [f32; 2],
         position: [f32; 2],
     }
 
-    implement_vertex!(Vertex, position);
+    implement_vertex!(Vertex, tex_coord, position);
 
-    let vertex1 = Vertex {
-        position: [-0.5, -0.5],
-    };
-    let vertex2 = Vertex {
-        position: [0.0, 0.5],
-    };
-    let vertex3 = Vertex {
-        position: [0.5, -0.25],
-    };
-    let shape = vec![vertex1, vertex2, vertex3];
+    let shape = [
+        Vertex {
+            tex_coord: [0., 0.],
+            position: [0., 0.],
+        },
+        Vertex {
+            tex_coord: [1., 0.],
+            position: [1., 0.],
+        },
+        Vertex {
+            tex_coord: [0., 1.],
+            position: [0., 1.],
+        },
+        Vertex {
+            tex_coord: [1., 1.],
+            position: [1., 1.],
+        },
+    ];
 
     let vertex_buffer = glium::VertexBuffer::new(display.as_ref(), &shape).unwrap();
-    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
+    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
 
     let display_clone = display.clone();
 
