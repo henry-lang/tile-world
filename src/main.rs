@@ -55,7 +55,7 @@ fn main() {
     let tile_types = TileTypes::load(["assets", "tile_types.ron"].iter().collect::<PathBuf>());
     log::info!("Found {} tile types from tile_types.ron", tile_types.len());
 
-    let tile_textures = tile_types.build_texture(&display);
+    let mut tile_textures = tile_types.build_texture(&display);
 
     let mut camera = Camera::new(display.clone(), Vec2::splat(0.5), 0., 100.0..1000.);
     let mut input = Input::new();
@@ -68,24 +68,32 @@ fn main() {
 
     implement_vertex!(Vertex, tex_coord, position);
 
-    let shape = [
-        Vertex {
-            tex_coord: [0., 0.],
-            position: [0., 0.],
-        },
-        Vertex {
-            tex_coord: [1., 0.],
-            position: [1., 0.],
-        },
-        Vertex {
-            tex_coord: [0., 1.],
-            position: [0., 1.],
-        },
-        Vertex {
-            tex_coord: [1., 1.],
-            position: [1., 1.],
-        },
-    ];
+    fn create_tile(x: f32, y: f32, vec: &mut Vec<Vertex>) {
+        vec.push(Vertex {
+            tex_coord: [x, y],
+            position: [x, y],
+        });
+        vec.push(Vertex {
+            tex_coord: [x + 1., y],
+            position: [x + 1., y],
+        });
+        vec.push(Vertex {
+            tex_coord: [x, y + 1.],
+            position: [x, y + 1.],
+        });
+        vec.push(Vertex {
+            tex_coord: [x + 1., y + 1.],
+            position: [x + 1., y + 1.],
+        });
+    }
+
+    let mut shape = vec![];
+
+    for x in 0..10 {
+        for y in 0..10 {
+            create_tile(x as f32, y as f32, &mut shape)
+        }
+    }
 
     let vertex_buffer = glium::VertexBuffer::new(display.as_ref(), &shape).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
@@ -93,10 +101,14 @@ fn main() {
     let display_clone = display.clone();
 
     event_loop.run(move |event, _, control_flow| {
-        //*control_flow = ControlFlow::WaitUntil(Instant::now() + Duration::from_millis(1000 / 60));
+        *control_flow = glutin::event_loop::ControlFlow::Poll;
 
         input.update(&event);
         camera.update(&input);
+
+        if input.is_key_pressed(glutin::event::VirtualKeyCode::R) {
+            tile_textures = tile_types.build_texture(&display);
+        }
 
         match event {
             Event::WindowEvent { event, .. } => match event {
@@ -105,33 +117,37 @@ fn main() {
                 }
                 _ => (),
             },
+            Event::MainEventsCleared => {
+                let start = Instant::now();
+
+                let behavior = SamplerBehavior {
+                    minify_filter: MinifySamplerFilter::Nearest,
+                    magnify_filter: MagnifySamplerFilter::Nearest,
+                    ..Default::default()
+                };
+
+                let uniforms = uniform! {
+                    projection: camera.projection_matrix().to_cols_array_2d(),
+                    tiles: Sampler(&tile_textures, behavior)
+                };
+
+                let mut target = display_clone.draw();
+                target.clear_color(1., 1., 1., 1.);
+
+                target
+                    .draw(
+                        &vertex_buffer,
+                        &indices,
+                        &shaders.default(),
+                        &uniforms,
+                        &Default::default(),
+                    )
+                    .unwrap();
+
+                target.finish().unwrap();
+                println!("{} FPS", 1000000 / start.elapsed().as_micros());
+            }
             _ => (),
         }
-
-        let behavior = SamplerBehavior {
-            minify_filter: MinifySamplerFilter::Nearest,
-            magnify_filter: MagnifySamplerFilter::Nearest,
-            ..Default::default()
-        };
-
-        let uniforms = uniform! {
-            projection: camera.projection_matrix().to_cols_array_2d(),
-            tiles: Sampler(&tile_textures, behavior)
-        };
-
-        let mut target = display_clone.draw();
-        target.clear_color(1., 1., 1., 1.);
-
-        target
-            .draw(
-                &vertex_buffer,
-                &indices,
-                &shaders.default(),
-                &uniforms,
-                &Default::default(),
-            )
-            .unwrap();
-
-        target.finish().unwrap();
     });
 }

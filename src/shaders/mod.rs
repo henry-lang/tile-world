@@ -43,9 +43,9 @@ impl Shaders {
         // .unwrap();
         // log::info!("Created shader program: tiles");
 
-        // let end = std::time::Instant::now();
+        let end = std::time::Instant::now();
 
-        // log::info!("Shader creation took {}ms", (end - start).as_millis());
+        log::info!("Shader creation took {}ms", (end - start).as_millis());
 
         Self {
             default, /* tiles */
