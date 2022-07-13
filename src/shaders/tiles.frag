@@ -1,8 +1,11 @@
-#version 430 core
+#version 330 core
 
-layout(location = 0) out vec4 color;
+uniform sampler2DArray tiles; 
+
+in vec3 tex_coord;
+
+out vec4 color;
 
 void main() {
-    vec2 q = gl_FragCoord.xy / 1024.;
-    color = vec4(q, 1., 1.);
+    color = texture(tiles, tex_coord);
 }

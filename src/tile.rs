@@ -1,6 +1,6 @@
 use glam::Vec3;
 use glium::{
-    texture::{RawImage2d, SrgbTexture2dArray},
+    texture::{RawImage2d, Texture2dArray},
     Display,
 };
 use serde::Deserialize;
@@ -34,7 +34,7 @@ impl TileTypes {
         self.types.len()
     }
 
-    pub fn build_texture(&self, display: &Display) -> SrgbTexture2dArray {
+    pub fn build_texture(&self, display: &Display) -> Texture2dArray {
         let start = std::time::Instant::now();
 
         let textures = self
@@ -56,18 +56,21 @@ impl TileTypes {
                 .expect("load image")
                 .to_rgba8();
 
-                log::info!("Loaded image {}", path.to_string_lossy());
-
                 let dimensions = image.dimensions();
+
+                if dimensions != (8, 8) {
+                    log::warn!("Texture {} is not 8x8", path.to_string_lossy());
+                }
+
+                log::info!("Loaded image {}", path.to_string_lossy());
 
                 RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dimensions)
             })
             .collect::<Vec<_>>();
 
-        let texture = SrgbTexture2dArray::new(display, textures).expect("create texture array");
+        let texture = Texture2dArray::new(display, textures).expect("create texture array");
 
         log::info!("Texture creation took {}ms", start.elapsed().as_millis());
-
         texture
     }
 }

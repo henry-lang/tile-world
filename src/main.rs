@@ -62,41 +62,29 @@ fn main() {
 
     #[derive(Copy, Clone)]
     struct Vertex {
-        tex_coord: [f32; 2],
-        position: [f32; 2],
+        tile_id: u16,
     }
 
-    implement_vertex!(Vertex, tex_coord, position);
+    implement_vertex!(Vertex, tile_id);
 
     fn create_tile(x: f32, y: f32, vec: &mut Vec<Vertex>) {
-        vec.push(Vertex {
-            tex_coord: [x, y],
-            position: [x, y],
-        });
-        vec.push(Vertex {
-            tex_coord: [x + 1., y],
-            position: [x + 1., y],
-        });
-        vec.push(Vertex {
-            tex_coord: [x, y + 1.],
-            position: [x, y + 1.],
-        });
-        vec.push(Vertex {
-            tex_coord: [x + 1., y + 1.],
-            position: [x + 1., y + 1.],
-        });
+        if x == 0. && y == 0. {
+            vec.push(Vertex { tile_id: 0 });
+        } else {
+            vec.push(Vertex { tile_id: 1 });
+        }
     }
 
     let mut shape = vec![];
 
     for x in 0..10 {
         for y in 0..10 {
-            create_tile(x as f32, y as f32, &mut shape)
+            create_tile(x as f32, y as f32, &mut shape);
         }
     }
 
     let vertex_buffer = glium::VertexBuffer::new(display.as_ref(), &shape).unwrap();
-    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+    let indices = glium::index::NoIndices(glium::index::PrimitiveType::Points);
 
     let display_clone = display.clone();
 
@@ -118,8 +106,6 @@ fn main() {
                 _ => (),
             },
             Event::MainEventsCleared => {
-                let start = Instant::now();
-
                 let behavior = SamplerBehavior {
                     minify_filter: MinifySamplerFilter::Nearest,
                     magnify_filter: MagnifySamplerFilter::Nearest,
@@ -138,14 +124,13 @@ fn main() {
                     .draw(
                         &vertex_buffer,
                         &indices,
-                        &shaders.default(),
+                        &shaders.tiles(),
                         &uniforms,
                         &Default::default(),
                     )
                     .unwrap();
 
                 target.finish().unwrap();
-                println!("{} FPS", 1000000 / start.elapsed().as_micros());
             }
             _ => (),
         }
