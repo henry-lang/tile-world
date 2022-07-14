@@ -35,7 +35,7 @@ struct Resources {
 
 fn create_display(event_loop: &EventLoop<()>) -> Display {
     let wb = WindowBuilder::new();
-    let cb = ContextBuilder::new();
+    let cb = ContextBuilder::new().with_srgb(false);
 
     Display::new(wb, cb, event_loop).expect("create display")
 }
@@ -60,28 +60,32 @@ fn main() {
     let mut camera = Camera::new(display.clone(), Vec2::splat(0.5), 0., 100.0..1000.);
     let mut input = Input::new();
 
-    #[derive(Copy, Clone)]
+    #[derive(Copy, Clone, Default, Debug)]
     struct Vertex {
         tile_id: u16,
     }
 
     implement_vertex!(Vertex, tile_id);
 
-    fn create_tile(x: f32, y: f32, vec: &mut Vec<Vertex>) {
-        if x == 0. && y == 0. {
-            vec.push(Vertex { tile_id: 0 });
+    fn create_tile(vec: &mut Vec<Vertex>) {
+        let prev = vec.last().map(|v| *v).unwrap_or_default();
+
+        if prev.tile_id == 0 {
+            vec.push(Vertex { tile_id: 1 })
         } else {
-            vec.push(Vertex { tile_id: 1 });
+            vec.push(Vertex { tile_id: 0 })
         }
     }
 
     let mut shape = vec![];
 
-    for x in 0..10 {
-        for y in 0..10 {
-            create_tile(x as f32, y as f32, &mut shape);
+    for _ in 0..10 {
+        for _ in 0..10 {
+            create_tile(&mut shape);
         }
     }
+
+    println!("{:?}", shape);
 
     let vertex_buffer = glium::VertexBuffer::new(display.as_ref(), &shape).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::Points);
